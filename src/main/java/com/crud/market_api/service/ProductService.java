@@ -8,8 +8,8 @@ public interface ProductService {
 
     ProductDto createProduct(ProductDto productDto);
     ProductDto updateProduct(ProductDto productDto);
-    ProductDto findById(Long id);
+    ProductDto findById(String id);
     List<ProductDto> getAllProducts();
-    void deleteProduct(Long id);
+    void deleteProduct(String id);
 
 }

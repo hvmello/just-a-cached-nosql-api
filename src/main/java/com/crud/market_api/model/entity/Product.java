@@ -1,27 +1,14 @@
 package com.crud.market_api.model.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-
+@Document(collection = "products")
 @Data
-@Entity
-@Table(name = "products")
-@NoArgsConstructor
-@AllArgsConstructor
 public class Product {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+    private String id;
     private String name;
-
-    @Column(nullable = false)
     private String type;
-
-
 }
