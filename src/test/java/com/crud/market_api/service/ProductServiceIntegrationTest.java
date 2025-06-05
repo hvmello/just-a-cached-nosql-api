@@ -59,13 +59,23 @@ class ProductServiceIntegrationTest {
         long start1 = System.nanoTime();
         ProductDto firstCall = productService.findById(testProduct.getId());
         long duration1 = System.nanoTime() - start1;
-        logger.info("First call duration: {} ns", duration1);
+
+        // Convert to milliseconds for better readability
+        double durationMs1 = duration1 / 1_000_000.0;
+        logger.info("First call (DB hit)    : {} ms", String.format("%.2f", durationMs1));
 
         // Second call - should hit cache
         long start2 = System.nanoTime();
         ProductDto secondCall = productService.findById(testProduct.getId());
         long duration2 = System.nanoTime() - start2;
-        logger.info("Second call duration: {} ns", duration2);
+
+        // Convert to milliseconds for better readability
+        double durationMs2 = duration2 / 1_000_000.0;
+        logger.info("Second call (Cache hit): {} ms", String.format("%.2f", durationMs2));
+
+        // Calculate and show performance improvement
+        double improvement = ((duration1 - duration2) / (double) duration1) * 100;
+        logger.info("Performance improvement: {}%", String.format("%.2f", improvement));
 
         // Assertions
         assertThat(secondCall).isNotNull();
@@ -77,6 +87,7 @@ class ProductServiceIntegrationTest {
                 .get();
         assertThat(cachedValue).isNotNull();
     }
+
 
     @Test
     @Order(3)
