@@ -7,6 +7,10 @@ import com.crud.market_api.repository.ProductRepository;
 import com.crud.market_api.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +22,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
+    @CachePut(value = "products", key = "#result.id")
+    @CacheEvict(value = "allProducts", allEntries = true)
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         Product product = new Product();
@@ -27,6 +33,7 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
+    @Cacheable(value = "products", key = "#id")
     @Override
     public ProductDto findById(String id) {
         Product product = productRepository.findById(id)
@@ -36,6 +43,7 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
+    @Cacheable(value = "allProducts")
     @Override
     public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream()
@@ -47,6 +55,10 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Caching(
+            put = {@CachePut(value = "products", key = "#productDto.id")},
+            evict = {@CacheEvict(value = "allProducts", allEntries = true)}
+    )
     @Override
     public ProductDto updateProduct(ProductDto productDto) {
         Product existingProduct = productRepository.findById(productDto.getId())
@@ -60,6 +72,12 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "products", key = "#id"),
+                    @CacheEvict(value = "allProducts", allEntries = true)
+            }
+    )
     @Override
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
